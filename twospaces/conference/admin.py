@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.db import models
 
 from .models import Conference, SponsorshipLevel, Sponsor
+from ..widgets import RichText
 
 class ConferenceAdmin (admin.ModelAdmin):
   list_display = ('name', 'default', 'slug', 'start', 'end', 'active', 'registration_open', 'registration_closed')
@@ -8,6 +10,10 @@ class ConferenceAdmin (admin.ModelAdmin):
   list_editable = ('active',)
   search_fields = ('name', )
   date_hierarchy = 'start'
+  
+  formfield_overrides = {
+    models.TextField: {'widget': RichText},
+  }
   
 class SponsorshipLevelAdmin (admin.ModelAdmin):
   list_display = ('name', 'conference', 'cost', 'order')
