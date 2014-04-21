@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage
 from django.template.response import TemplateResponse
 
+from .forms import SponsorForm
+
 def favicon (request):
   if request.conference and request.conference['favicon']:
     return http.HttpResponseRedirect(default_storage.url(request.conference['favicon']))
@@ -21,6 +23,31 @@ def conference_home (request, slug):
   context = {
     'conference': request.conference,
     'home': True,
+  }
+  return TemplateResponse(request, templates, context)
+  
+def conference_sponsor (request, slug):
+  templates = (
+    'conference/{}/sponsor.html'.format(request.conference['slug']),
+    'conference/sponsor.html'
+  )
+  
+  form = SponsorForm(request.conference['id'])
+  if request.POST:
+    form = SponsorForm(request.conference['id'], request.POST, request.FILES)
+    
+    if form.is_valid():
+      sponsor = form.save(commit=False)
+      sponsor.active = False
+      sponsor.save()
+      sponsor.notify()
+      templates = (
+        'conference/{}/sponsor-thankyou.html'.format(request.conference['slug']),
+        'conference/sponsor-thankyou.html'
+      )
+      
+  context = {
+    'form': form,
   }
   return TemplateResponse(request, templates, context)
   

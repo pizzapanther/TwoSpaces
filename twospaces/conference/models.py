@@ -2,8 +2,13 @@ from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.cache import get_cache
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from django.template.loader import render_to_string
 
 cache = get_cache('default')
+
+from ..settings import SPONSOR_NOTIFY, SPEAKER_NOTIFY
 
 class ActiveManager (models.Manager):
   def get_queryset (self):
@@ -101,3 +106,26 @@ class Sponsor (models.Model):
     
   link.allow_tags = True
   
+  def notify (self):
+    if SPONSOR_NOTIFY:
+      c = {
+        'sponsor': self
+      }
+      
+      slug = self.level.conference.slug
+      text_templates = (
+        'conference/{}/sponsor-notify.email.txt'.format(slug),
+        'conference/sponsor-notify.email.txt'
+      )
+      html_templates = (
+        'conference/{}/sponsor-notify.email.html'.format(slug),
+        'conference/sponsor-notify.email.html'
+      )
+      
+      text = render_to_string(text_templates, c)
+      html = render_to_string(html_templates, c)
+      
+      msg = EmailMultiAlternatives('New Sponsor', text, settings.DEFAULT_FROM_EMAIL, SPONSOR_NOTIFY)
+      msg.attach_alternative(html, "text/html")
+      msg.send()
+      
