@@ -7,11 +7,13 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet
 from .models import SocialHandle, EmailVerification
 from .decorators import login_required
 
+@ensure_csrf_cookie
 def signup (request):
   initial = {}
   r = request.GET.get('redirect', '')
@@ -38,6 +40,7 @@ def logout_view (request):
   logout(request)
   return http.HttpResponseRedirect("/")
   
+@ensure_csrf_cookie
 def login_view (request):
   error = None
   
