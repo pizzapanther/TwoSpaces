@@ -6,3 +6,7 @@ main_patterns = patterns('twospaces.conference.views',
   url(r'^([-\w]+)/$', 'conference_home', name='conference-home'),
   url(r'^([-\w]+)/sponsor/$', 'conference_sponsor', name='conference-sponsor'),
 )
+
+main_patterns += patterns('',
+  url(r'^profile/', include('twospaces.profiles.urls', namespace='profiles', app_name='profiles')),
+)
