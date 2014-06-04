@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib.sites.models import get_current_site
 
 from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet
 from .models import SocialHandle, EmailVerification
@@ -27,6 +28,7 @@ def signup (request):
       user = form.save(commit=False)
       user.set_password(form.cleaned_data['password'])
       user.save()
+      user.send_verify(get_current_site(request))
       
       user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
       login(request, user)
@@ -69,6 +71,7 @@ def profile (request):
     
     if form.is_valid() and formset.is_valid():
       user = form.save()
+      user.send_verify(get_current_site(request))
       formset.save()
       
       messages.success(request, 'Profile Updated!')

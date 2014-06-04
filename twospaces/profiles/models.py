@@ -8,7 +8,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 
 class User (AbstractUser):
   verified_email = models.EmailField(null=True, blank=True,
@@ -23,19 +22,17 @@ class User (AbstractUser):
   def __unicode__ (self):
     return self.username
     
+  def send_verify (self, site):
+    if not self.verified_email or self.email.lower() != self.verified_email.lower():
+      ev = EmailVerification.create_verify(self)
+      subject = "Please verify your address - {}".format(settings.SITE_NAME)
+      message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'site': site})
+      send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [ev.sent_to], fail_silently=False)
+      
 emailField = User._meta.get_field('email')
 emailField._unique = True
 emailField.blank = False
 
-@receiver(post_save, sender=User, dispatch_uid='user_post_save')
-def send_verify_email (sender, instance, **kwargs):
-  if not instance.verified_email or instance.email.lower() != instance.verified_email.lower():
-    ev = EmailVerification.create_verify(instance)
-    subject = "Please verify your address - {}".format(settings.SITE_NAME)
-    site = Site.objects.get(id=settings.SITE_ID)
-    message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'site': site})
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [ev.sent_to], fail_silently=False)
-    
 SOCIAL_SITES = (
   ('about.me', 'About.Me'),
   ('facebook', 'Facebook'),
