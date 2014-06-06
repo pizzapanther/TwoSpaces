@@ -5,6 +5,7 @@ from django.core.cache import get_cache
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.core.mail import send_mail
 
 cache = get_cache('default')
 
@@ -129,3 +130,58 @@ class Sponsor (models.Model):
       msg.attach_alternative(html, "text/html")
       msg.send()
       
+SESSION_TYPES = (
+  ('lightning', 'Lightning Talk (5 Minutes)'),
+  ('talk-short', 'Short Talk (25 Minutes)'),
+  ('talk-long', 'Talk (50 Minutes)'),
+  ('tutorial', 'Tutorial (3 Hours)'),
+)
+
+SESSION_LENGTH = {
+  'lightning': 5,
+  'talk-short': 25,
+  'talk-long': 50,
+  'tutorial': 180,
+}
+
+SESSION_STATUS = (
+  ('submitted', 'Submitted'),
+  ('maybe', 'Maybe'),
+  ('accepted', 'Accepted'),
+  ('declined', 'Declined'),
+)
+
+SESSION_LEVELS = (
+  ('beginner', 'Beginner'),
+  ('intermediate', 'Intermediate'),
+  ('advanced', 'Advanced'),
+)
+
+class Session (models.Model):
+  user = models.ForeignKey(settings.AUTH_USER_MODEL)
+  conference = models.ForeignKey(Conference)
+  
+  name = models.CharField('Title of Talk', max_length=100)
+  description = models.TextField()
+  
+  stype = models.CharField('Session Type', max_length=25, choices=SESSION_TYPES)
+  level = models.CharField('Audience Level', max_length=25, choices=SESSION_LEVELS)
+  
+  status = models.CharField(max_length=25, choices=SESSION_STATUS, default='submitted')
+  
+  start = models.DateTimeField(blank=True, null=True)
+  duration = models.IntegerField(blank=True, null=True, help_text="Time in Minutes")
+  
+  special_requirements = models.TextField(blank=True, null=True, help_text="If you require any special equipment or materials, please let us know here.")
+  
+  def set_duration (self):
+    self.duration = SESSION_LENGTH[self.stype]
+    
+  class Meta:
+    ordering = ("start",)
+    
+  def send_submitted (self, request):
+    subject = "Talk Submission - {}".format(self.user.__unicode__())
+    message = render_to_string('conference/email.talk-submission.txt', {'request': request, 'session': self})
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, SPEAKER_NOTIFY, fail_silently=False)
+    

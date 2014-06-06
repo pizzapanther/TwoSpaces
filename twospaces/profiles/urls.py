@@ -5,5 +5,6 @@ urlpatterns = patterns('twospaces.profiles.views',
   url(r'^login/$', 'login_view', name='login'),
   url(r'^logout/$', 'logout_view', name='logout'),
   url(r'^edit/$', 'profile', name='profile'),
+  url(r'^speaker-info/$', 'speaker_info', name='speaker-info'),
   url(r'^verify/$', 'email_verify', name='verify'),
 )

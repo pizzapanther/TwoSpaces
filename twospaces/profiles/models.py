@@ -29,6 +29,10 @@ class User (AbstractUser):
       message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'site': site})
       send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [ev.sent_to], fail_silently=False)
       
+  @staticmethod
+  def autocomplete_search_fields ():
+    return ("id__iexact", "username__icontains", "first_name__icontains", "last_name__icontains", "email__icontains")
+    
 emailField = User._meta.get_field('email')
 emailField._unique = True
 emailField.blank = False

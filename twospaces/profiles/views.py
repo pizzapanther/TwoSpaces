@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.sites.models import get_current_site
 
-from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet
+from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet, SpeakerForm
 from .models import SocialHandle, EmailVerification
 from .decorators import login_required
 
@@ -85,6 +85,25 @@ def profile (request):
     formset = SocialHandleFormSet(instance=request.user)
     
   return TemplateResponse(request, 'profiles/edit.html', {'form': form, 'title': 'My Profile', 'formset': formset})
+  
+@login_required
+def speaker_info (request):
+  if request.POST:
+    form = SpeakerForm(request.POST, instance=request.user)
+    
+    if form.is_valid():
+      form.save()
+      return http.HttpResponseRedirect(form.cleaned_data['redirect'])
+      
+  else:
+    initial = None
+    r = request.GET.get('redirect', '')
+    if r:
+      initial = {'redirect': r}
+      
+    form = SpeakerForm(instance=request.user, initial=initial)
+    
+  return TemplateResponse(request, 'profiles/speaker-info.html', {'form': form, 'title': 'About You'})
   
 def email_verify (request):
   secret = request.GET.get('secret', '')

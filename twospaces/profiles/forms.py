@@ -34,13 +34,29 @@ class SignupForm (BootstrapFormMixin, forms.ModelForm):
     return data
     
 class ProfileForm (BootstrapFormMixin, forms.ModelForm):
+  phone = USPhoneNumberField(max_length=25, required=False, help_text="Optional: Used for conference notifications.")
+  
   class Meta:
     model = User
-    fields = ('first_name', 'last_name', 'email', 'phone', 'biography', 'website', 'avatar')
+    fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'biography', 'website', 'avatar')
     widgets = {
       'biography': MarkdownWidget
     }
     
+class SpeakerForm (BootstrapFormMixin, forms.ModelForm):
+  phone = USPhoneNumberField(max_length=25, required=False, help_text="Used in case we need to contact you.")
+  redirect = forms.CharField(initial=profile_url, widget=forms.HiddenInput)
+  
+  class Meta:
+    model = User
+    fields = ('first_name', 'last_name', 'phone', 'biography')
+    widgets = {
+      'biography': MarkdownWidget
+    }
+    
+for f in ('first_name', 'last_name', 'phone', 'biography'):
+  SpeakerForm.base_fields[f].required = True
+  
 class SocialHandleForm (BootstrapFormMixin, forms.ModelForm):
   class Meta:
     model = SocialHandle

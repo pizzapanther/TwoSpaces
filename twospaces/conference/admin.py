@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
-from .models import Conference, SponsorshipLevel, Sponsor
+from .models import Conference, SponsorshipLevel, Sponsor, Session
 from ..widgets import RichText
 
 class ConferenceAdmin (admin.ModelAdmin):
@@ -33,6 +33,20 @@ class SponsorAdmin (admin.ModelAdmin):
     'fk': ['level'],
   }
   
+class SessionAdmin (admin.ModelAdmin):
+  list_display = ('name', 'conference', 'user', 'stype', 'level', 'start', 'duration', 'status')
+  list_filter = ('conference', 'stype', 'level', 'status')
+  list_editable = ('status',)
+  raw_id_fields = ('user',)
+  autocomplete_lookup_fields = {
+    'fk': ['user'],
+  }
+  
+  formfield_overrides = {
+    models.TextField: {'widget': RichText},
+  }
+  
 admin.site.register(Conference, ConferenceAdmin)
 admin.site.register(SponsorshipLevel, SponsorshipLevelAdmin)
 admin.site.register(Sponsor, SponsorAdmin)
+admin.site.register(Session, SessionAdmin)

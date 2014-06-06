@@ -4,7 +4,10 @@ from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage
 from django.template.response import TemplateResponse
 
-from .forms import SponsorForm
+from twospaces.profiles.decorators import login_required, speaker_info_required
+
+from .forms import SponsorForm, SessionForm
+from .models import Conference
 
 def favicon (request):
   if request.conference and request.conference['favicon']:
@@ -50,4 +53,39 @@ def conference_sponsor (request, slug):
     'form': form,
   }
   return TemplateResponse(request, templates, context)
+  
+@login_required
+@speaker_info_required
+def conference_submit_talk (request, slug):
+  templates = (
+    'conference/{}/submit-talk.html'.format(request.conference['slug']),
+    'conference/submit-talk.html'
+  )
+  
+  form = SessionForm(request.POST or None)
+  if request.POST:
+    if form.is_valid():
+      session = form.save(commit=False)
+      session.set_duration()
+      session.user = request.user
+      session.conference_id = request.conference['id']
+      session.save()
+      
+      session.send_submitted(request)
+      
+      return http.HttpResponseRedirect(reverse('conference-submit-talk-success', args=(request.conference['slug'],)))
+      
+  context = {
+    'form': form,
+    'title': 'Submit A Talk',
+  }
+  return TemplateResponse(request, templates, context)
+  
+def conference_submit_talk_success (request, slug):
+  templates = (
+    'conference/{}/submit-talk-success.html'.format(request.conference['slug']),
+    'conference/submit-talk-success.html'
+  )
+  
+  return TemplateResponse(request, templates, context = {'title': 'Talk Submission Successful'})
   
