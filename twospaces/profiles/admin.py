@@ -38,7 +38,7 @@ class User2Admin (UserAdmin):
   fieldsets = (
     (None, {'fields': ('username', 'password')}),
     ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'verified_email', 'website',
-      ('photo', 'avatar'), 'biography')}),
+      'avatar', 'biography')}),
     ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups')}),
     ('Important dates', {'fields': ('last_login', 'date_joined')}),
   )

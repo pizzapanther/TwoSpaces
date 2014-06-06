@@ -16,7 +16,7 @@ class LoginForm (BootstrapFormMixin, forms.Form):
   redirect = forms.CharField(initial="/", widget=forms.HiddenInput)
   
 class SignupForm (BootstrapFormMixin, forms.ModelForm):
-  phone = USPhoneNumberField(max_length=25, required=False, help_text="Optional: Used for conference notifications.")
+  phone = USPhoneNumberField(max_length=25, required=False, help_text="Optional: Used for conference SMS notifications.")
   password = forms.CharField(widget=forms.PasswordInput)
   confirm_password = forms.CharField(widget=forms.PasswordInput)
   redirect = forms.CharField(initial=profile_url, widget=forms.HiddenInput)
@@ -34,7 +34,7 @@ class SignupForm (BootstrapFormMixin, forms.ModelForm):
     return data
     
 class ProfileForm (BootstrapFormMixin, forms.ModelForm):
-  phone = USPhoneNumberField(max_length=25, required=False, help_text="Optional: Used for conference notifications.")
+  phone = USPhoneNumberField(max_length=25, required=False, help_text="Optional: Used for conference SMS notifications.")
   
   class Meta:
     model = User
