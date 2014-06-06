@@ -109,7 +109,7 @@ def email_verify (request):
   secret = request.GET.get('secret', '')
   old = timezone.now() - datetime.timedelta(days=10)
   ev = get_object_or_404(EmailVerification, secret=secret, created__gte=old, used=False)
-  ev.user.email = ev.sent_to
+  ev.user.verified_email = ev.sent_to
   ev.user.save()
   ev.used = True
   ev.save()
