@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 class User (AbstractUser):
   verified_email = models.EmailField(null=True, blank=True,
     help_text="If doesn't match e-mail field then user is sent a link to verify address.")
-  biography = models.TextField(null=True, blank=True)
+  biography = models.TextField(null=True, blank=True, help_text="Markdown formatted text accepted.")
   website = models.URLField(null=True, blank=True)
   
   avatar = models.ImageField(upload_to="user_photos/%Y-%m", blank=True, null=True)
