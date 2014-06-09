@@ -174,6 +174,9 @@ class Session (models.Model):
   
   special_requirements = models.TextField(blank=True, null=True, help_text="If you require any special equipment or materials, please let us know here.")
   
+  def __unicode__ (self):
+    return self.name
+    
   def set_duration (self):
     self.duration = SESSION_LENGTH[self.stype]
     
