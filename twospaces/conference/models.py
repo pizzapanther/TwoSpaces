@@ -183,6 +183,9 @@ class Session (models.Model):
   class Meta:
     ordering = ("start",)
     
+  def email (self):
+    return self.user.email
+    
   def send_submitted (self, request):
     subject = "Talk Submission - {}".format(self.user.__unicode__())
     message = render_to_string('conference/email.talk-submission.txt', {'request': request, 'session': self})

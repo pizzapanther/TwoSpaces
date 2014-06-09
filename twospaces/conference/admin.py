@@ -34,7 +34,7 @@ class SponsorAdmin (admin.ModelAdmin):
   }
   
 class SessionAdmin (admin.ModelAdmin):
-  list_display = ('name', 'conference', 'user', 'stype', 'level', 'start', 'duration', 'status')
+  list_display = ('name', 'conference', 'user', 'email', 'stype', 'level', 'start', 'duration', 'status')
   list_filter = ('conference', 'stype', 'level', 'status')
   list_editable = ('status',)
   raw_id_fields = ('user',)
