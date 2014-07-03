@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 from twospaces.profiles.decorators import login_required, speaker_info_required
 
 from .forms import SponsorForm, SessionForm
-from .models import Conference
+from .models import Conference, Session
 
 def favicon (request):
   if request.conference and request.conference['favicon']:
@@ -88,4 +88,18 @@ def conference_submit_talk_success (request, slug):
   )
   
   return TemplateResponse(request, templates, context = {'title': 'Talk Submission Successful'})
+  
+def conference_proposed_talks (request, slug):
+  templates = (
+    'conference/{}/proposed-talks.html'.format(request.conference['slug']),
+    'conference/proposed-talks.html'
+  )
+  
+  sessions = Session.objects.filter(conference__id=request.conference['id']).order_by('name').select_related()
+  
+  c = {
+    'title': 'Proposed Talks',
+    'sessions': sessions
+  }
+  return TemplateResponse(request, templates, context=c)
   

@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.sites.models import get_current_site
 
 from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet, SpeakerForm
-from .models import SocialHandle, EmailVerification
+from .models import SocialHandle, EmailVerification, User
 from .decorators import login_required
 
 @ensure_csrf_cookie
@@ -115,4 +115,9 @@ def email_verify (request):
   ev.save()
   
   return TemplateResponse(request, 'profiles/verification_success.html', {'title': "Verification Successful"})
+  
+def public_profile (request, username):
+  user = get_object_or_404(User, username=username)
+  
+  return TemplateResponse(request, 'profiles/public.html', {'user': user, 'title': user.username})
   

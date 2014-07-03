@@ -7,4 +7,6 @@ urlpatterns = patterns('twospaces.profiles.views',
   url(r'^edit/$', 'profile', name='profile'),
   url(r'^speaker-info/$', 'speaker_info', name='speaker-info'),
   url(r'^verify/$', 'email_verify', name='verify'),
+  
+  url(r'^(\S+)$', 'public_profile', name='public-profile'),
 )
