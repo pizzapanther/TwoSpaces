@@ -119,5 +119,5 @@ def email_verify (request):
 def public_profile (request, username):
   user = get_object_or_404(User, username=username)
   
-  return TemplateResponse(request, 'profiles/public.html', {'user': user, 'title': user.username})
+  return TemplateResponse(request, 'profiles/public.html', {'User': user, 'title': user.username})
   
