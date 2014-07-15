@@ -10,6 +10,40 @@ from ..forms import BootstrapFormMixin
 
 profile_url = reverse_lazy('profiles:profile')
 
+class ResetForm (BootstrapFormMixin, forms.Form):
+  password = forms.CharField(widget=forms.PasswordInput)
+  password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+  
+  def clean (self):
+    cleaned_data = super(ResetForm, self).clean()
+    
+    if cleaned_data['password'] != cleaned_data['password2']:
+      self._errors["password"] = self.error_class(['Passwords do not match.'])
+      
+    return cleaned_data
+    
+class ForgotForm (BootstrapFormMixin, forms.Form):
+  username = forms.CharField(required=False)
+  email = forms.EmailField(label='E-Mail', required=False)
+  
+  def clean (self):
+    cleaned_data = super(ForgotForm, self).clean()
+    username = cleaned_data.get('username', None)
+    email = cleaned_data.get('email', None)
+    
+    if not username and not email:
+      self._errors["email"] = self._errors["username"] = self.error_class(['Enter a username or e-mail'])
+      
+    if username:
+      if User.objects.filter(username=username).count() == 0:
+        self._errors["username"] = self.error_class(['Unknown username'])
+        
+    elif email:
+      if User.objects.filter(email=email).count() == 0:
+        self._errors["email"] = self.error_class(['Unknown e-mail'])
+        
+    return cleaned_data
+    
 class LoginForm (BootstrapFormMixin, forms.Form):
   username = forms.CharField()
   password = forms.CharField(widget=forms.PasswordInput)

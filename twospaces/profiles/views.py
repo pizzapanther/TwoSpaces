@@ -10,7 +10,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.sites.models import get_current_site
 
-from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet, SpeakerForm
+from .forms import LoginForm, SignupForm, ProfileForm, SocialHandleFormSet, SpeakerForm, \
+  ForgotForm, ResetForm
+  
 from .models import SocialHandle, EmailVerification, User
 from .decorators import login_required
 
@@ -120,4 +122,51 @@ def public_profile (request, username):
   user = get_object_or_404(User, username=username)
   
   return TemplateResponse(request, 'profiles/public.html', {'User': user, 'title': user.username})
+  
+@ensure_csrf_cookie
+def forgot (request):
+  if request.POST:
+    form = ForgotForm(request.POST)
+    if form.is_valid():
+      if form.cleaned_data['username']:
+        user = User.objects.get(username=form.cleaned_data['username'])
+        
+      else:
+        user = User.objects.get(email=form.cleaned_data['email'])
+        
+      user.send_reset(get_current_site(request))
+      return TemplateResponse(request, 'profiles/forgot-sent.html', {'form': form, 'title': 'Password Reset Sent'})
+      
+  else:
+    form = ForgotForm()
+    
+  return TemplateResponse(request, 'profiles/forgot.html', {'form': form, 'title': 'Password Reset'})
+  
+@ensure_csrf_cookie
+def reset (request):
+  secret = request.REQUEST.get('secret', '')
+  old = timezone.now() - datetime.timedelta(days=10)
+  ev = get_object_or_404(EmailVerification, secret=secret, created__gte=old, used=False)
+  
+  if request.POST:
+    form = ResetForm(request.POST)
+    if form.is_valid():
+      ev.user.verified_email = ev.sent_to
+      ev.user.set_password(form.cleaned_data['password'])
+      ev.user.save()
+      
+      user = authenticate(username=ev.user.username, password=form.cleaned_data['password'])
+      if user is not None and user.is_active:
+        login(request, user)
+        
+      ev.used = True
+      ev.save()
+      
+      return TemplateResponse(request, 'profiles/reset-ok.html', {'form': form, 'title': 'Password Reset Successful'})
+      
+  else:
+    form = ResetForm()
+    
+  return TemplateResponse(request, 'profiles/reset.html', {
+    'form': form, 'secret': secret, 'title': 'Password Reset'})
   
