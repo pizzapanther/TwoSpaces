@@ -9,6 +9,8 @@ main_patterns = patterns('twospaces.conference.views',
   url(r'^([-\w]+)/submit-talk/success/$', 'conference_submit_talk_success', name='conference-submit-talk-success'),
   
   url(r'^([-\w]+)/proposed-talks/$', 'conference_proposed_talks', name='conference-proposed-talks'),
+  
+  url(r'^invoice/(\S+)/$', 'invoice', name='conference-invoice'),
 )
 
 main_patterns += patterns('',

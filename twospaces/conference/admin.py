@@ -1,7 +1,14 @@
+import hashlib
+import random
+import datetime
+
+from functools import update_wrapper
+
 from django.contrib import admin
 from django.db import models
+from django import http
 
-from .models import Conference, SponsorshipLevel, Sponsor, Session
+from .models import Conference, SponsorshipLevel, Sponsor, Session, Invoice
 from ..widgets import RichText
 
 class ConferenceAdmin (admin.ModelAdmin):
@@ -46,7 +53,55 @@ class SessionAdmin (admin.ModelAdmin):
     models.TextField: {'widget': RichText},
   }
   
+class InvoiceAdmin (admin.ModelAdmin):
+  list_display = ('to', 'name', 'amount', 'paid_on', 'sent', 'Send', 'Payment')
+  list_filter = ('paid_on',)
+  date_hierarchy = 'sent'
+  exclude = ('sent', 'key')
+  
+  def save_model (self, request, obj, form, change):
+    if not obj.key:
+      while 1:
+        m = hashlib.md5()
+        m.update(obj.to)
+        m.update(obj.text)
+        m.update(obj.subject)
+        m.update(datetime.datetime.now().strftime("'%Y-%m-%d %H:%M:%S.%f"))
+        m.update(unicode(random.randint(0, 100000000)))
+        key = m.hexdigest()
+        if Invoice.objects.filter(key=key).count() == 0:
+          break
+          
+      obj.key = key
+      
+    obj.save()
+    
+  def get_urls (self):
+    from django.conf.urls import patterns, url
+    def wrap(view):
+      def wrapper(*args, **kwargs):
+        return self.admin_site.admin_view(view)(*args, **kwargs)
+        
+      return update_wrapper(wrapper, view)
+      
+    info = self.model._meta.app_label, self.model._meta.model_name
+    
+    urlpatterns = patterns('',
+      url(r'^(\d+)/send/$', wrap(self.send_view), name='%s_%s_send' % info),
+    )
+    
+    urlpatterns += super(InvoiceAdmin, self).get_urls()
+    
+    return urlpatterns
+    
+  def send_view (self, request, object_id):
+    obj = self.get_object(request, object_id)
+    obj.send(request)
+    
+    return http.HttpResponseRedirect('../../')
+    
 admin.site.register(Conference, ConferenceAdmin)
 admin.site.register(SponsorshipLevel, SponsorshipLevelAdmin)
 admin.site.register(Sponsor, SponsorAdmin)
 admin.site.register(Session, SessionAdmin)
+admin.site.register(Invoice, InvoiceAdmin)

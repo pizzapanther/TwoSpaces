@@ -3,11 +3,17 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage
 from django.template.response import TemplateResponse
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from twospaces.profiles.decorators import login_required, speaker_info_required
 
 from .forms import SponsorForm, SessionForm
-from .models import Conference, Session
+from .models import Conference, Session, Invoice
+
+import stripe
+stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
 
 def favicon (request):
   if request.conference and request.conference['favicon']:
@@ -100,6 +106,37 @@ def conference_proposed_talks (request, slug):
   c = {
     'title': 'Proposed Talks',
     'sessions': sessions
+  }
+  return TemplateResponse(request, templates, context=c)
+  
+@ensure_csrf_cookie
+def invoice (request, key):
+  invoice = get_object_or_404(Invoice, key=key)#, paid_on__isnull=True)
+  
+  if request.POST:
+    invoice.paid_on = timezone.now()
+    invoice.stripe_token = request.POST.get('stripeToken')
+    charge = stripe.Charge.create(
+      amount=invoice.cents(),
+      currency="usd",
+      card=invoice.stripe_token,
+      description=invoice.name
+    )
+    invoice.stripe_charge = charge['id']
+    invoice.save()
+    
+    templates = (
+      'conference/invoice-success.html'
+    )
+    
+  else:
+    templates = (
+      'conference/invoice.html'
+    )
+  
+  c = {
+    'title': invoice.name,
+    'invoice': invoice
   }
   return TemplateResponse(request, templates, context=c)
   
