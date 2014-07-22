@@ -111,7 +111,7 @@ def conference_proposed_talks (request, slug):
   
 @ensure_csrf_cookie
 def invoice (request, key):
-  invoice = get_object_or_404(Invoice, key=key)#, paid_on__isnull=True)
+  invoice = get_object_or_404(Invoice, key=key, paid_on__isnull=True)
   
   if request.POST:
     invoice.paid_on = timezone.now()
