@@ -120,7 +120,8 @@ def invoice (request, key):
       amount=invoice.cents(),
       currency="usd",
       card=invoice.stripe_token,
-      description=invoice.name
+      description=invoice.name,
+      receipt_email=invoice.to,
     )
     invoice.stripe_charge = charge['id']
     invoice.save()
