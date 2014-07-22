@@ -57,7 +57,7 @@ class InvoiceAdmin (admin.ModelAdmin):
   list_display = ('to', 'name', 'amount', 'paid_on', 'sent', 'Send', 'Payment')
   list_filter = ('paid_on',)
   date_hierarchy = 'sent'
-  exclude = ('sent', 'key')
+  exclude = ('key',)
   
   def save_model (self, request, obj, form, change):
     if not obj.key:
