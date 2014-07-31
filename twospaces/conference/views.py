@@ -35,6 +35,15 @@ def conference_home (request, slug):
   }
   return TemplateResponse(request, templates, context)
   
+def conference_sponsors (request, slug):
+  templates = (
+    'conference/{}/sponsors.html'.format(request.conference['slug']),
+    'conference/sponsors.html'
+  )
+  
+  context = {'title': 'Sponsors'}
+  return TemplateResponse(request, templates, context)
+  
 def conference_sponsor (request, slug):
   templates = (
     'conference/{}/sponsor.html'.format(request.conference['slug']),
