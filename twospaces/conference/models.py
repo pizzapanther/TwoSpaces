@@ -84,7 +84,7 @@ class SponsorshipLevel (models.Model):
     return ("id__iexact", "name__icontains")
     
   def sponsors (self):
-    return self.sponsor_set.filter(active=True)
+    return self.sponsor_set.filter(active=True).order_by('?')
     
 class Sponsor (models.Model):
   name = models.CharField(max_length=100)
