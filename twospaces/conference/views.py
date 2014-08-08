@@ -118,6 +118,22 @@ def conference_proposed_talks (request, slug):
   }
   return TemplateResponse(request, templates, context=c)
   
+def conference_talk_detail (request, slug, tid):
+  session = get_object_or_404(Session, id=tid, conference__id=request.conference['id'])
+  if session.status == 'declined':
+    raise http.Http404
+    
+  templates = (
+    'conference/{}/talk-detail.html'.format(request.conference['slug']),
+    'conference/talk-detail.html'
+  )
+  
+  c = {
+    'title': session.name,
+    'session': session
+  }
+  return TemplateResponse(request, templates, context=c)
+  
 @ensure_csrf_cookie
 def invoice (request, key):
   invoice = get_object_or_404(Invoice, key=key, paid_on__isnull=True)
