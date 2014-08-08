@@ -9,7 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from twospaces.profiles.decorators import login_required, speaker_info_required
 
-from .forms import SponsorForm, SessionForm
+from .forms import SponsorForm, SessionForm, LightningSessionForm
 from .models import Conference, Session, Invoice
 
 import stripe
@@ -71,16 +71,26 @@ def conference_sponsor (request, slug):
   
 @login_required
 @speaker_info_required
-def conference_submit_talk (request, slug):
+def conference_submit_talk (request, slug, talk=None):
+  if talk == 'lightning':
+    formClass = LightningSessionForm
+    
+  else:
+    formClass = SessionForm
+    
   templates = (
     'conference/{}/submit-talk.html'.format(request.conference['slug']),
     'conference/submit-talk.html'
   )
   
-  form = SessionForm(request.POST or None)
+  form = formClass(request.POST or None)
   if request.POST:
     if form.is_valid():
       session = form.save(commit=False)
+      if talk == 'lightning':
+        session.stype = 'lightning'
+        session.level = 'beginner'
+        
       session.set_duration()
       session.user = request.user
       session.conference_id = request.conference['id']
@@ -93,6 +103,7 @@ def conference_submit_talk (request, slug):
   context = {
     'form': form,
     'title': 'Submit A Talk',
+    'talk': talk
   }
   return TemplateResponse(request, templates, context)
   
@@ -110,7 +121,7 @@ def conference_proposed_talks (request, slug):
     'conference/proposed-talks.html'
   )
   
-  sessions = Session.objects.filter(conference__id=request.conference['id']).order_by('name').select_related()
+  sessions = Session.objects.filter(conference__id=request.conference['id']).exclude(stype='lightning').order_by('name').select_related()
   
   c = {
     'title': 'Proposed Talks',

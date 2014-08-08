@@ -3,6 +3,12 @@ from django import forms
 from .models import Sponsor, SponsorshipLevel, Session
 from ..forms import BootstrapFormMixin
 
+SESSION_TYPES = (
+  ('talk-short', 'Short Talk (25 Minutes)'),
+  ('talk-long', 'Talk (50 Minutes)'),
+  ('tutorial', 'Tutorial (3 Hours)'),
+)
+
 class SponsorForm (forms.ModelForm):
   def __init__ (self, conf_id, *args, **kwargs):
     super(SponsorForm, self).__init__(*args, **kwargs)
@@ -18,7 +24,14 @@ class SponsorForm (forms.ModelForm):
     fields = ('name', 'url', 'contact_name', 'contact_phone', 'contact_email', 'level', 'logo')
     
 class SessionForm (BootstrapFormMixin, forms.ModelForm):
+  stype = forms.ChoiceField(choices=SESSION_TYPES, label="Session Type")
+  
   class Meta:
     model = Session
     fields = ('name', 'stype', 'level', 'description', 'special_requirements')
+    
+class LightningSessionForm (BootstrapFormMixin, forms.ModelForm):
+  class Meta:
+    model = Session
+    fields = ('name', 'description')
     
