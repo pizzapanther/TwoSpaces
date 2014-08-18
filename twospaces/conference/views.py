@@ -6,6 +6,7 @@ from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db.models import Q
 
 from twospaces.profiles.decorators import login_required, speaker_info_required
 
@@ -120,15 +121,22 @@ def conference_proposed_talks (request, slug):
     'conference/{}/proposed-talks.html'.format(request.conference['slug']),
     'conference/proposed-talks.html'
   )
-  
-  sessions = Session.objects.filter(conference__id=request.conference['id']).exclude(stype='lightning').order_by('name').select_related()
-  
+
+  sessions = Session.objects.filter(conference__id=request.conference['id'])
+  lightning_sessions = sessions.filter(stype='lightning')
+  standard_sessions = sessions.filter(Q(stype='talk-short') | Q(stype='talk-long'))
+  tutorial_sessions = sessions.filter(stype='tutorial')
+
   c = {
     'title': 'Proposed Talks',
-    'sessions': sessions
+    'lightning_sessions': lightning_sessions.order_by('name').select_related(),
+    'standard_sessions': standard_sessions.order_by('name').select_related(),
+    'tutorial_sessions': tutorial_sessions.order_by('name').select_related()
   }
+
   return TemplateResponse(request, templates, context=c)
-  
+
+
 def conference_talk_detail (request, slug, tid):
   session = get_object_or_404(Session, id=tid, conference__id=request.conference['id'])
   if session.status == 'declined':
