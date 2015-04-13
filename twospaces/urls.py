@@ -10,6 +10,8 @@ speakers_v1_urls = [
 
 users_v1_urls = [
   url(r'^profile/(\S+)$', profile_v1_views.user_detail, name="user-detail"),
+  url(r'^login$', profile_v1_views.login_view, name="login"),
+  url(r'^logout$', profile_v1_views.logout_view, name="logout"),
 ]
 
 version1_urls = [
