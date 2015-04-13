@@ -19,7 +19,6 @@ def proposed_talks (request):
   for t in (
     ('talk-short', 'Short Talks'),
     ('talk-long', 'Long Talks'),
-    ('talk-long', 'Long Talks'),
     ('tutorial', 'Tutorials'),
     ('lightning', 'Lightning Talks'),
   ):
