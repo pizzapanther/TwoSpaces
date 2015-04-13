@@ -5,7 +5,7 @@ from twospaces.profiles.serializers import UserPublicSizzler
 from twospaces.utils import DynamicFieldsMixin
 
 class ProposedReadSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
-  user = UserPublicSizzler()
+  user = UserPublicSizzler(exclude=('biography', 'website', 'social_handles'))
   level = serializers.CharField(source='get_level_display', read_only=True)
   stype = serializers.CharField(source='get_stype_display', read_only=True)
   

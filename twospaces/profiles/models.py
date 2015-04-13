@@ -80,7 +80,7 @@ SOCIAL_INFO = {
 }
 
 class SocialHandle (models.Model):
-  user = models.ForeignKey(settings.AUTH_USER_MODEL)
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='social_handles')
   username = models.CharField(max_length=35)
   site = models.CharField(max_length=25, choices=SOCIAL_SITES)
   

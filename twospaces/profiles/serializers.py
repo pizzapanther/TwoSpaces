@@ -1,10 +1,18 @@
 from rest_framework import serializers
 
-from twospaces.profiles.models import User
+from twospaces.utils import DynamicFieldsMixin
+from twospaces.profiles.models import User, SocialHandle
 
-class UserPublicSizzler (serializers.ModelSerializer):
+class SocialHandleSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
+  class Meta:
+    model = SocialHandle
+    fields = ('username', 'site')
+    
+class UserPublicSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
+  social_handles = SocialHandleSizzler(many=True)
+  
   class Meta:
     model = User
-    fields = ('id', 'username', 'name', 'image')
+    fields = ('username', 'name', 'image', 'biography', 'website', 'social_handles')
     read_only_fields = fields
     
