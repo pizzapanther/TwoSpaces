@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
+from django_gravatar.helpers import get_gravatar_url
+
 class User (AbstractUser):
   verified_email = models.EmailField(null=True, blank=True,
     help_text="If doesn't match e-mail field then user is sent a link to verify address.")
@@ -50,6 +52,12 @@ class User (AbstractUser):
       return self.last_name
       
     return None
+    
+  def image (self):
+    if self.avatar:
+      return self.avatar.url
+      
+    return get_gravatar_url(self.email, size=256)
     
 emailField = User._meta.get_field('email')
 emailField._unique = True
