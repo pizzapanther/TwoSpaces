@@ -1,5 +1,8 @@
 from bunch import Bunch
 
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -25,7 +28,16 @@ def proposed_talks (request):
     )
     
   for i in range(0, len(talks)):
-    talks[i][1] = ProposedReadSizzler(talks[i][1], many=True).data
+    talks[i][1] = ProposedReadSizzler(talks[i][1], many=True, exclude=['description']).data
     
   return Response(talks, status=200)
+  
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def talk_detail (request, tid):
+  conf = request.GET.get('conf', '')
+  queryset = get_object_or_404(
+    Session, ~Q(status='declined'), id=tid, conference__slug=conf)
+  
+  return Response(ProposedReadSizzler(queryset).data, status=200)
   

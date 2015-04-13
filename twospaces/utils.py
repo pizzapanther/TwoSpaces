@@ -81,3 +81,16 @@ class CSVFileGenerator (object):
     response['Content-Disposition'] = 'attachment; filename=' + self.getFileName()
     return response
     
+class DynamicFieldsMixin (object):
+  def __init__ (self, *args, **kwargs):
+    exclude = kwargs.pop('exclude', None)
+    
+    super(DynamicFieldsMixin, self).__init__(*args, **kwargs)
+    
+    if exclude is not None:
+      existing = set(self.fields.keys())
+      for field_name in existing:
+        if field_name in exclude:
+          self.fields.pop(field_name)
+          
+        
