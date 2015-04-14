@@ -6,6 +6,7 @@ import twospaces.profiles.api1_views as profile_v1_views
 speakers_v1_urls = [
   url(r'^proposed-talks$', conf_v1_views.proposed_talks, name="proposed-talks"),
   url(r'^talk/(\d+)$', conf_v1_views.talk_detail, name="talk-detail"),
+  url(r'^submit-talk$', conf_v1_views.edit_talk, name="submit-talk"),
 ]
 
 users_v1_urls = [

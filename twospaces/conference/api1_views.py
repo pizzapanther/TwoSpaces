@@ -7,8 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from twospaces.conference.models import Session
-from twospaces.conference.serializers import ProposedReadSizzler
+from twospaces.conference.models import Session, Conference
+from twospaces.conference.serializers import ProposedReadSizzler, SessionSizzler
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -39,4 +39,31 @@ def talk_detail (request, tid):
     Session, ~Q(status='declined'), id=tid, conference__slug=conf)
   
   return Response(ProposedReadSizzler(queryset).data, status=200)
+  
+@api_view(['POST', 'GET'])
+@permission_classes((IsAuthenticated, ))
+def edit_talk (request, tid=None):
+  session = None
+  if tid:
+    session = get_object_or_404(Session, id=tid)
+    
+  if request.JSON():
+    sizzle = SessionSizzler(session, data=request.JSON())
+    if sizzle.is_valid():
+      conf = get_object_or_404(Conference, slug=request.JSON()['conf'])
+      
+      obj = sizzle.save(
+        conference=conf,
+        user=request.user,
+      )
+      
+      return Response({'status': 'OK'}, status=200)
+      
+    else:
+      return Response({'errors': sizzle.errors}, status=400)
+      
+  else:
+    sizzle = SessionSizzler(session)
+    
+  return Response(sizzle.data, status=200)
   
