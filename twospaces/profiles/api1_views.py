@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -41,4 +42,10 @@ def logout_view (request):
   response = Response({'status': 'OK'}, status=200)
   response.delete_cookie('angular_logged_in')
   return response
+  
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@ensure_csrf_cookie
+def csrf_generator (request):
+  return Response({'status': 'OK'}, status=200)
   
