@@ -24,11 +24,11 @@ class User (AbstractUser):
   def __str__ (self):
     return self.username
     
-  def send_verify (self, site):
+  def send_verify (self, request, slug):
     if not self.verified_email or self.email.lower() != self.verified_email.lower():
       ev = EmailVerification.create_verify(self)
       subject = "Please verify your address - {}".format(settings.SITE_NAME)
-      message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'site': site})
+      message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'request': request, 'slug': slug})
       send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [ev.sent_to], fail_silently=False)
       
   def send_reset (self, site):
@@ -108,8 +108,8 @@ class EmailVerification (models.Model):
   @classmethod
   def create_verify (cls, user):
     while 1:
-      salt = hashlib.sha256(str(random.random())).hexdigest()[:5]
-      ck = hashlib.sha256(salt + user.email).hexdigest()
+      salt = hashlib.sha256(str(random.random()).encode('utf-8')).hexdigest()[:5]
+      ck = hashlib.sha256(str(salt + user.email).encode('utf-8')).hexdigest()
       ev = cls(user=user, secret=ck, sent_to=user.email)
       
       try:

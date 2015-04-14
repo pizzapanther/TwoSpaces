@@ -1,15 +1,17 @@
+import datetime
+
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils import timezone
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from twospaces.profiles.models import User
-from twospaces.profiles.serializers import UserPublicSizzler
+from twospaces.profiles.models import User, EmailVerification
+from twospaces.profiles.serializers import UserPublicSizzler, UserSizzler, UserUpdateSizzler
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -29,8 +31,13 @@ def login_view (request):
   
   if user:
     login(request, user)
+    
+    value = 'user'
+    if user.phone and user.biography:
+      value = 'speaker'
+      
     response = Response({'status': 'OK'}, status=200)
-    response.set_cookie('angular_logged_in', value='true', httponly=False)
+    response.set_cookie('angular_logged_in', value=value, httponly=False)
     return response
     
   return Response({'errors': {'username': ['Username or Password is incorrect.']}}, status=400)
@@ -43,9 +50,69 @@ def logout_view (request):
   response.delete_cookie('angular_logged_in')
   return response
   
-@api_view(['GET'])
+@api_view(['POST', 'GET'])
 @permission_classes((AllowAny, ))
-@ensure_csrf_cookie
-def csrf_generator (request):
-  return Response({'status': 'OK'}, status=200)
+def edit_profile (request):
+  user = None
+  Sizzler = UserSizzler
+  json_data = request.JSON()
+  
+  if request.user.is_authenticated():
+    user = request.user
+    Sizzler = UserUpdateSizzler
+    
+  if json_data:
+    sizzle = Sizzler(user, data=json_data)
+    if sizzle.is_valid():
+      obj = sizzle.save()
+      
+      if user is None:
+        obj.set_password(sizzle.validated_data['password'])
+        obj.save()
+        
+        obj = authenticate(
+          username=sizzle.validated_data['username'],
+          password=sizzle.validated_data['password']
+        )
+        login(request, obj)
+        
+      else:
+        if 'password' in sizzle.validated_data:
+          obj.set_password(sizzle.validated_data['password'])
+          obj.save()
+          update_session_auth_hash(request, obj)
+          
+      value = 'user'
+      if obj.phone and obj.biography:
+        value = 'speaker'
+        
+      obj.send_verify(request, json_data['conf'])
+      response = Response({'status': 'OK'}, status=200)
+      response.set_cookie('angular_logged_in', value=value, httponly=False)
+      return response
+      
+    else:
+      return Response({'errors': sizzle.errors}, status=400)
+      
+  else:
+    sizzle = Sizzler(user)
+    
+  return Response(sizzle.data, status=200)
+  
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def verify (request):
+  json_data = request.JSON()
+  if json_data:
+    secret = json_data.get('secret', '')
+    if secret:
+      old = timezone.now() - datetime.timedelta(days=10)
+      ev = get_object_or_404(EmailVerification, secret=secret, created__gte=old, used=False)
+      ev.user.verified_email = ev.sent_to
+      ev.user.save()
+      ev.used = True
+      ev.save()
+      return Response({'status': 'OK'}, status=200)
+      
+  return Response({'status': 'invalid'}, status=400)
   

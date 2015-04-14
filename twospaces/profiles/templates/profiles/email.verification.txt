@@ -1,0 +1,3 @@
+Please verify your e-mail address by visiting the link below.
+
+http://{{ request.get_host }}/{{ slug }}/user/verify?secret={{ ev.secret|urlencode }}

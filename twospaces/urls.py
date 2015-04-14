@@ -15,12 +15,19 @@ users_v1_urls = [
   url(r'^profile/(\S+)$', profile_v1_views.user_detail, name="user-detail"),
   url(r'^login$', profile_v1_views.login_view, name="login"),
   url(r'^logout$', profile_v1_views.logout_view, name="logout"),
-  url(r'^ensure-csrf', profile_v1_views.csrf_generator, name="ensure-csrf"),
+  url(r'^sign-up$', profile_v1_views.edit_profile, name="sign-up"),
+  url(r'^my-profile$', profile_v1_views.edit_profile, name="my-profile"),
+  url(r'^verify$', profile_v1_views.verify, name="verify"),
+]
+
+conf_v1_urls = [
+  url(r'^data$', conf_v1_views.conf_data, name="data"),
 ]
 
 version1_urls = [
   url('^speakers/', include(speakers_v1_urls, namespace='speakers')),
   url('^users/', include(users_v1_urls, namespace='users')),
+  url('^conferences/', include(conf_v1_urls, namespace='conferences')),
 ]
 
 urlpatterns = [

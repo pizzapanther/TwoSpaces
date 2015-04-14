@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from twospaces.conference.models import Session
+from twospaces.conference.models import Session, Conference
 from twospaces.profiles.serializers import UserPublicSizzler
 from twospaces.utils import DynamicFieldsMixin
 
@@ -18,4 +18,11 @@ class SessionSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
   class Meta:
     model = Session
     fields = ('name', 'description', 'level', 'stype', 'slides', 'special_requirements')
+    
+class ConferenceReadSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
+  class Meta:
+    model = Conference
+    fields = ('name', 'slug', 'start', 'end', 'registration_open', 
+              'registration_closed', 'cfp_open', 'cfp_closed')
+    read_only_fields = fields
     
