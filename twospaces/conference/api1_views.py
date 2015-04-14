@@ -45,7 +45,7 @@ def talk_detail (request, tid):
 def edit_talk (request, tid=None):
   session = None
   if tid:
-    session = get_object_or_404(Session, id=tid)
+    session = get_object_or_404(Session, id=tid, user=request.user)
     
   if request.JSON():
     sizzle = SessionSizzler(session, data=request.JSON())
@@ -56,6 +56,9 @@ def edit_talk (request, tid=None):
         conference=conf,
         user=request.user,
       )
+      obj.set_duration()
+      obj.save()
+      obj.send_submitted(request)
       
       return Response({'status': 'OK'}, status=200)
       
@@ -66,4 +69,12 @@ def edit_talk (request, tid=None):
     sizzle = SessionSizzler(session)
     
   return Response(sizzle.data, status=200)
+  
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+def my_talks (request):
+  conf = request.GET.get('conf', '')
+  queryset = Session.objects.filter(conference__slug=conf, user=request.user).order_by('name')
+  talks = ProposedReadSizzler(queryset, many=True, exclude=['description', 'user']).data
+  return Response(talks, status=200)
   
