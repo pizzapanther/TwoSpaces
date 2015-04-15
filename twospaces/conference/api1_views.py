@@ -83,7 +83,7 @@ def edit_talk (request, tid=None):
       obj.set_duration()
       obj.save()
       if tid is None:
-        obj.send_submitted(request)
+        obj.send_submitted(request, conf)
         
       return Response({'status': 'OK'}, status=200)
       
