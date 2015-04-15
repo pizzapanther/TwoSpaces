@@ -1,5 +1,7 @@
 import datetime
 
+from django import http
+from django import forms
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
@@ -12,6 +14,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from twospaces.profiles.models import User, EmailVerification
 from twospaces.profiles.serializers import UserPublicSizzler, UserSizzler, UserUpdateSizzler
+
+from django_gravatar.helpers import get_gravatar_url
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -49,6 +53,42 @@ def logout_view (request):
   response = Response({'status': 'OK'}, status=200)
   response.delete_cookie('angular_logged_in')
   return response
+  
+@api_view(['POST', 'GET'])
+@permission_classes((IsAuthenticated, ))
+def profile_image (request):
+  if request.JSON():
+    if request.JSON().get('gravatar', ''):
+      request.user.avatar = None
+      request.user.save()
+      
+  images = {
+    'gravatar': get_gravatar_url(request.user.email, size=256)
+  }
+  
+  if request.user.avatar:
+    images['image'] = request.user.avatar.url
+    
+  return Response(images, status=200)
+  
+class AvatarForm (forms.ModelForm):
+  avatar = forms.ImageField(required=True)
+  
+  class Meta:
+    model = User
+    fields = ['avatar']
+    
+def avatar_upload (request):
+  url = request.POST.get('ret', '/')
+  
+  if 'avatar' in request.FILES:
+    form = AvatarForm(request.POST, request.FILES, instance=request.user)
+    
+    if form.is_valid():
+      form.save()
+      return http.HttpResponseRedirect('{}?success=1'.format(url))
+      
+  return http.HttpResponseRedirect('{}?error=1'.format(url))
   
 @api_view(['POST', 'GET'])
 @permission_classes((AllowAny, ))

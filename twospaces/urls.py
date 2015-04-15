@@ -17,9 +17,11 @@ users_v1_urls = [
   url(r'^logout$', profile_v1_views.logout_view, name="logout"),
   url(r'^sign-up$', profile_v1_views.edit_profile, name="sign-up"),
   url(r'^my-profile$', profile_v1_views.edit_profile, name="my-profile"),
+  url(r'^my-profile-image$', profile_v1_views.profile_image, name="my-profile-image"),
   url(r'^verify$', profile_v1_views.verify, name="verify"),
   url(r'^reset-password$', profile_v1_views.start_reset_password, name="start-reset-password"),
   url(r'^reset-password-finish$', profile_v1_views.finish_reset_password, name="finish-reset-password"),
+  url(r'^avatar-upload$', profile_v1_views.avatar_upload, name="avatar-upload"),
 ]
 
 conf_v1_urls = [
