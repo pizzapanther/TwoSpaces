@@ -52,8 +52,12 @@ def edit_talk (request, tid=None):
   else:
     return Response({'message': 'Fill out your speaker profile before submitting.'}, status=400)
     
-  conf = get_object_or_404(Conference, slug=request.JSON()['conf'])
-  
+  if request.JSON():
+    conf = get_object_or_404(Conference, slug=request.JSON()['conf'])
+    
+  else:
+    conf = get_object_or_404(Conference, slug=request.GET.get('conf', ''))
+    
   if tid:
     session = get_object_or_404(Session, id=tid, user=request.user)
     
