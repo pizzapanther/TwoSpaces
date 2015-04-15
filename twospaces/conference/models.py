@@ -221,8 +221,8 @@ class Session (models.Model):
   def full_name(self):
     return u'{self.user.first_name} {self.user.last_name}'.format(self=self)
 
-  def send_submitted (self, request, slug):
-    subject = "Talk Submission - {} - {} {}".format(self.user.__str__(), settings.SITE_NAME, slug)
+  def send_submitted (self, request, conf):
+    subject = "Talk Submission - {} - {}".format(self.user.__str__(), conf)
     message = render_to_string('conference/email.talk-submission.txt', {'request': request, 'session': self})
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, SPEAKER_NOTIFY, fail_silently=False)
     
