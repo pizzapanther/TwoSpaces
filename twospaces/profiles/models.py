@@ -31,10 +31,10 @@ class User (AbstractUser):
       message = render_to_string('profiles/email.verification.txt', {'ev': ev, 'request': request, 'slug': slug})
       send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [ev.sent_to], fail_silently=False)
       
-  def send_reset (self, site):
+  def send_reset (self, request, slug):
     reset = EmailVerification.create_verify(self)
     subject = "Password Reset - {}".format(settings.SITE_NAME)
-    message = render_to_string('profiles/password_reset.txt', {'reset': reset, 'site': site})
+    message = render_to_string('profiles/password_reset.txt', {'reset': reset, 'request': request, 'slug': slug})
     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [reset.sent_to], fail_silently=False)
     
   @staticmethod

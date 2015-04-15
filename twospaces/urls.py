@@ -18,6 +18,8 @@ users_v1_urls = [
   url(r'^sign-up$', profile_v1_views.edit_profile, name="sign-up"),
   url(r'^my-profile$', profile_v1_views.edit_profile, name="my-profile"),
   url(r'^verify$', profile_v1_views.verify, name="verify"),
+  url(r'^reset-password$', profile_v1_views.start_reset_password, name="start-reset-password"),
+  url(r'^reset-password-finish$', profile_v1_views.finish_reset_password, name="finish-reset-password"),
 ]
 
 conf_v1_urls = [

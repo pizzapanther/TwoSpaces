@@ -116,3 +116,51 @@ def verify (request):
       
   return Response({'status': 'invalid'}, status=400)
   
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def start_reset_password (request):
+  json_data = request.JSON()
+  if json_data:
+    user = None
+    try:
+      if 'username' in json_data and json_data['username']:
+        user = User.objects.get(username=json_data['username'])
+        
+      elif 'email' in json_data and json_data['email']:
+        user = User.objects.get(email=json_data['email'])
+        
+    except User.DoesNotExist:
+      return Response({'message': 'Can not find record.'}, status=400)
+      
+    if user:
+      user.send_reset(request, json_data['conf'])
+      return Response({'status': 'OK'}, status=200)
+      
+  return Response({'message': 'No data provided'}, status=400)
+  
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def finish_reset_password (request):
+  json_data = request.JSON()
+  if json_data:
+    if 'secret' in json_data:
+      old = timezone.now() - datetime.timedelta(days=10)
+      try:
+        ev = EmailVerification.objects.get(secret=json_data['secret'], created__gte=old, used=False)
+        
+      except EmailVerification.DoesNotExist:
+        return Response({'message': 'Invalid reset key.'}, status=400)
+        
+      else:
+        if 'password' in json_data:
+          ev.user.verified_email = ev.sent_to
+          ev.user.set_password(json_data['password'])
+          ev.user.save()
+          
+          ev.used = True
+          ev.save()
+          
+        return Response({'status': 'OK'}, status=200)
+        
+  return Response({'message': 'No data provided'}, status=400)
+  
