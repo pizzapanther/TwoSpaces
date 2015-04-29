@@ -167,7 +167,7 @@ SESSION_TYPES = (
 SESSION_LENGTH = {
   'lightning': 5,
   'talk-short': 20,
-  'talk-long': 45,
+  'talk-long': 50,
   'tutorial': 180,
 }
 
