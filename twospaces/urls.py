@@ -2,6 +2,7 @@ from django.conf.urls import include, url
 
 import twospaces.conference.api1_views as conf_v1_views
 import twospaces.profiles.api1_views as profile_v1_views
+import twospaces.blog.api1_views as blog_v1_views
 
 speakers_v1_urls = [
   url(r'^proposed-talks$', conf_v1_views.proposed_talks, name="proposed-talks"),
@@ -28,10 +29,16 @@ conf_v1_urls = [
   url(r'^data$', conf_v1_views.conf_data, name="data"),
 ]
 
+blog_v1_urls = [
+  url(r'^posts$', blog_v1_views.posts, name="posts"),
+  url(r'^post/(\S+)$', blog_v1_views.post_detail, name="post-detail"),
+]
+
 version1_urls = [
   url('^speakers/', include(speakers_v1_urls, namespace='speakers')),
   url('^users/', include(users_v1_urls, namespace='users')),
   url('^conferences/', include(conf_v1_urls, namespace='conferences')),
+  url('^blog/', include(blog_v1_urls, namespace='blog')),
 ]
 
 urlpatterns = [

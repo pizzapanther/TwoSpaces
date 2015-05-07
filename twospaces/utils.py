@@ -93,4 +93,26 @@ class DynamicFieldsMixin (object):
         if field_name in exclude:
           self.fields.pop(field_name)
           
-        
+PER_PAGE = 25
+def paginate_queryset (request, queryset):
+  page = request.GET.get('page', '1')
+  try:
+    page = int(page)
+    
+  except ValueError:
+    raise http.Http404
+    
+  total = queryset.count()
+  start = (page - 1) * PER_PAGE
+  end = start + PER_PAGE
+  
+  next_page = None
+  prev_page = None
+  if page - 1 > 0:
+    prev_page = page - 1
+    
+  if end < total:
+    next_page = page + 1
+    
+  return queryset[start:end], page, next_page, prev_page
+  
