@@ -19,7 +19,12 @@ def post_detail (request, slug):
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 def latest (request):
-  latest_post = BlogPost.published.latest()
+  try:
+    latest_post = BlogPost.published.latest()
+    
+  except BlogPost.DoesNotExist:
+    return Response(None, status=200)
+    
   sizzle = PostSizzler(latest_post, exclude=('body',))
   return Response(sizzle.data, status=200)
   
