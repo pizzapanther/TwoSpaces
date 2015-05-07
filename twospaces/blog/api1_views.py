@@ -18,6 +18,13 @@ def post_detail (request, slug):
   
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
+def latest (request):
+  latest_post = BlogPost.published.latest()
+  sizzle = PostSizzler(latest_post, exclude=('body',))
+  return Response(sizzle.data, status=200)
+  
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
 def posts (request):
   qs = BlogPost.published.all()
   title = 'Blog'

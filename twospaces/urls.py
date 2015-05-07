@@ -31,6 +31,7 @@ conf_v1_urls = [
 
 blog_v1_urls = [
   url(r'^posts$', blog_v1_views.posts, name="posts"),
+  url(r'^latest$', blog_v1_views.latest, name="latest"),
   url(r'^post/(\S+)$', blog_v1_views.post_detail, name="post-detail"),
 ]
 
