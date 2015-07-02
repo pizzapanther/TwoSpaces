@@ -9,8 +9,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from twospaces.conference.models import Session, Conference
-from twospaces.conference.serializers import ProposedReadSizzler, SessionSizzler, ConferenceReadSizzler
+from twospaces.conference.models import Session, Conference, SponsorshipLevel
+from twospaces.conference.serializers import ProposedReadSizzler, \
+  SessionSizzler, ConferenceReadSizzler, SponsorshipLevelSizzler
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -111,4 +112,12 @@ def conf_data (request):
   conf = get_object_or_404(Conference, slug=conf)
   
   return Response(ConferenceReadSizzler(conf).data, status=200)
+  
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def sponsor_data (request):
+  conf = request.GET.get('conf', '')
+  conf = get_object_or_404(Conference, slug=conf)
+  queryset = SponsorshipLevel.objects.filter(conference=conf)
+  return Response(SponsorshipLevelSizzler(queryset, many=True).data, status=200)
   

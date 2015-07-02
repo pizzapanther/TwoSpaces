@@ -27,6 +27,7 @@ users_v1_urls = [
 
 conf_v1_urls = [
   url(r'^data$', conf_v1_views.conf_data, name="data"),
+  url(r'^sponsors', conf_v1_views.sponsor_data, name="sponsors"),
 ]
 
 blog_v1_urls = [
