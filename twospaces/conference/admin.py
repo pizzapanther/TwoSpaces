@@ -49,13 +49,6 @@ class CSVAdminMixin (object):
       
     return super(CSVAdminMixin, self).changelist_view(request, extra_context=extra_context)
     
-  class Media:
-    js = (
-      'ks/js/jquery-1.8.0.min.js',
-      'ks/js/clear_filters.js',
-      'conf/js/csv.js',
-    )
-    
 class ConferenceAdmin (admin.ModelAdmin):
   list_display = ('name', 'slug', 'start', 'end', 'active', 'registration_open', 'registration_closed')
   list_filter = ('active',)
