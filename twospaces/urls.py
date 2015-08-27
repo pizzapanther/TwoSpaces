@@ -10,6 +10,7 @@ speakers_v1_urls = [
   url(r'^submit-talk$', conf_v1_views.edit_talk, name="submit-talk"),
   url(r'^edit-talk/(\d+)$', conf_v1_views.edit_talk, name="edit-talk"),
   url(r'^my-talks$', conf_v1_views.my_talks, name="my-talks"),
+  url(r'^schedule$', conf_v1_views.schedule, name="schedule"),
 ]
 
 users_v1_urls = [

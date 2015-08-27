@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from twospaces.conference.models import Session, Conference, SponsorshipLevel, Sponsor
+from twospaces.conference.models import Session, Conference, SponsorshipLevel, Sponsor, Room
+from twospaces.profiles.models import User
 from twospaces.profiles.serializers import UserPublicSizzler
 from twospaces.utils import DynamicFieldsMixin
 
@@ -39,4 +40,26 @@ class SponsorshipLevelSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
     model = SponsorshipLevel
     fields = ('name', 'sponsors')
     read_only_fields = fields
+    
+class RoomSizzler (serializers.ModelSerializer):
+  class Meta:
+    model = Room
+    fields = ('name',)
+    
+class UserSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ('username', 'name')
+    read_only_fields = fields
+    
+class SessionScheduleSizzler (serializers.ModelSerializer):
+  room = RoomSizzler()
+  user = UserSizzler()
+  
+  class Meta:
+    model = Session
+    fields = (
+      'id', 'name', 'level', 'stype', 'all_rooms', 'room', 'start', 'duration',
+      'user'
+    )
     
