@@ -162,7 +162,8 @@ def schedule (request):
       if talk['room'] and not talk['all_rooms']:
         room_key = talk['room']['name']
         
-      if talk['start'].endswith(':00:00Z') and i != 0:
+      h = talk['start'].split('T')[1].split(':')[0]
+      if h != last_hour and i != 0:
         if talk['start'] == last_hour:
           append_room(hour, room_key, talk)
           
@@ -170,7 +171,7 @@ def schedule (request):
           hours.append(hour)
           hour = {}
           append_room(hour, room_key, talk)
-          last_hour = talk['start']
+          last_hour = h
           
       else:
         append_room(hour, room_key, talk)

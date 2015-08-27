@@ -59,7 +59,7 @@ class SessionScheduleSizzler (serializers.ModelSerializer):
   class Meta:
     model = Session
     fields = (
-      'id', 'name', 'level', 'stype', 'all_rooms', 'room', 'start', 'duration',
-      'user'
+      'id', 'name', 'level', 'stype', 'all_rooms', 'room', 'start', 'end',
+      'duration', 'user'
     )
     
