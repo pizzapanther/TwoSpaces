@@ -1,5 +1,9 @@
 import datetime
 
+import release
+
+RELEASE = release.release()
+
 from bunch import Bunch
 
 from django.shortcuts import get_object_or_404
@@ -135,7 +139,7 @@ def append_room (hour, room_key, talk):
     
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-@cache_page(settings.API_CACHE)
+@cache_page(settings.API_CACHE, key_prefix=RELEASE)
 def schedule (request):
   schedule = []
   conf = request.GET.get('conf', '')
