@@ -45,7 +45,7 @@ class UserSizzler (DynamicFieldsMixin, serializers.ModelSerializer):
 class UserUpdateSizzler (UserSizzler):
   class Meta:
     model = User
-    fields = ('username', 'email', 'password', 'name', 'image', 'biography', 'website', 'social_handles', 'phone')
+    fields = ('username', 'email', 'password', 'name', 'first_name', 'last_name', 'image', 'biography', 'website', 'social_handles', 'phone')
     extra_kwargs = {'password': {'write_only': True, 'required': False}}
     
   def update (self, instance, validated_data):
