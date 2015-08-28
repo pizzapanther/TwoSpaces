@@ -185,7 +185,7 @@ def schedule (request):
       
     rooms = []
     for talk in queryset:
-      if talk.room and talk.room.name not in rooms:
+      if not talk.all_rooms and talk.room and talk.room.name not in rooms:
         rooms.append(talk.room.name)
         
     label = d.strftime("%a %d")
