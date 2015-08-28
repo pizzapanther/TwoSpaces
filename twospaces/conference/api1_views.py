@@ -161,6 +161,7 @@ def schedule (request):
     hours = []
     hour = {}
     last_hour = ''
+    
     for i, talk in enumerate(sizzler.data):
       room_key = 'all'
       if talk['room'] and not talk['all_rooms']:
@@ -170,13 +171,16 @@ def schedule (request):
       if h != last_hour and i != 0:
         if talk['start'] == last_hour:
           append_room(hour, room_key, talk)
+          last_all = False
           
         else:
           hours.append(hour)
           hour = {}
           append_room(hour, room_key, talk)
           last_hour = h
-          
+          if talk['all_rooms']:
+            last_hour = ''
+            
       else:
         append_room(hour, room_key, talk)
         
