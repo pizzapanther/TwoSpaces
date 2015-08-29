@@ -123,3 +123,20 @@ class EmailVerification (models.Model):
         
     return ev
     
+class SMS (models.Model):
+  to = models.CharField(max_length=50)
+  frm = models.CharField('From', max_length=50)
+  
+  message = models.CharField(max_length=255)
+  
+  reply_to = models.ForeignKey('self', blank=True, null=True)
+  created = models.DateTimeField(auto_now_add=True)
+  read = models.BooleanField(default=False)
+  
+  def __str__ (self):
+    return '{}: {}'.format(self.frm, self.message)
+    
+  class Meta:
+    ordering = ('-created', )
+    verbose_name_plural = 'SMS\'s'
+    
