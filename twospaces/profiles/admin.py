@@ -111,8 +111,8 @@ class User2Admin(UserAdmin):
           'fields': ('first_name', 'last_name', 'email', 'verified_email',
                      'phone', 'website', 'avatar', 'biography')
       }), ('Permissions',
-           {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups')}),
-      ('Important dates', {'fields': ('last_login', 'date_joined')}),)
+           {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups')
+           }), ('Important dates', {'fields': ('last_login', 'date_joined')}),)
 
   readonly_fields = ('last_login', 'date_joined')
 

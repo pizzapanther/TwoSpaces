@@ -19,6 +19,7 @@ from twospaces.profiles.serializers import UserPublicSizzler, UserSizzler, UserU
 from django_gravatar.helpers import get_gravatar_url
 from rest_framework_jwt.settings import api_settings
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def user_detail(request, username):
@@ -88,17 +89,17 @@ class AvatarForm(forms.ModelForm):
 def avatar_upload(request):
   jwt = request.POST.get('jwt', '')
   url = request.POST.get('ret', '/')
-  
+
   jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
   try:
     payload = jwt_decode_handler(jwt)
-    
+
   except:
     pass
-    
+
   else:
     user = User.objects.get(id=payload['user_id'], is_active=True)
-    
+
   if 'avatar' in request.FILES:
     form = AvatarForm(request.POST, request.FILES, instance=user)
 
