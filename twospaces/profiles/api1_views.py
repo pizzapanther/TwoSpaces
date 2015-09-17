@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -16,7 +17,7 @@ from twospaces.profiles.models import User, EmailVerification
 from twospaces.profiles.serializers import UserPublicSizzler, UserSizzler, UserUpdateSizzler
 
 from django_gravatar.helpers import get_gravatar_url
-
+from rest_framework_jwt.settings import api_settings
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
@@ -83,11 +84,23 @@ class AvatarForm(forms.ModelForm):
     fields = ['avatar']
 
 
+@csrf_exempt
 def avatar_upload(request):
+  jwt = request.POST.get('jwt', '')
   url = request.POST.get('ret', '/')
-
+  
+  jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+  try:
+    payload = jwt_decode_handler(jwt)
+    
+  except:
+    pass
+    
+  else:
+    user = User.objects.get(id=payload['user_id'], is_active=True)
+    
   if 'avatar' in request.FILES:
-    form = AvatarForm(request.POST, request.FILES, instance=request.user)
+    form = AvatarForm(request.POST, request.FILES, instance=user)
 
     if form.is_valid():
       form.save()
