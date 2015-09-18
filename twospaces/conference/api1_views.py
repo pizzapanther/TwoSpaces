@@ -13,6 +13,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_page
 from django.conf import settings
 
+import requests
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -230,3 +232,39 @@ def schedule(request):
     d += datetime.timedelta(days=1)
 
   return Response(schedule, status=200)
+  
+def attendee_data (page=1):
+  url = '{}/events/{}/attendees/'.format(settings.EVENTBRITE_API_URL, settings.EVENTBRITE_EVENT_ID)
+  params = {
+    'token': settings.EVENTBRITE_OAUTH_TOKEN,
+    'page': page
+  }
+
+  response = requests.get(url, params=params)
+  
+  return response.json()
+  
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def attendees(request):
+  if request.user.is_staff:
+    page = 1
+    peeps = []
+  
+    while 1:
+      data = attendee_data(page)
+      
+      for attendee in data['attendees']:
+        if attendee['checked_in'] and attendee['profile']['name'] not in peeps:
+          peeps.append(attendee['profile']['name'])
+          
+      if data['pagination']['page_count'] == data['pagination']['page_number']:
+        break
+  
+      else:
+        page = page + 1
+  
+    return Response(peeps, status=200)
+    
+  return Response([], status=200)
+  

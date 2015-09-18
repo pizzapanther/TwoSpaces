@@ -65,6 +65,9 @@ conf_v1_urls = [
     url(r'^sponsors',
         conf_v1_views.sponsor_data,
         name="sponsors"),
+    url(r'^attendees',
+        conf_v1_views.attendees,
+        name="attendees"),
 ]
 
 blog_v1_urls = [
