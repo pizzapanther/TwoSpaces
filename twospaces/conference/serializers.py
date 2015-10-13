@@ -14,7 +14,7 @@ class ProposedReadSizzler(DynamicFieldsMixin, serializers.ModelSerializer):
   class Meta:
     model = Session
     fields = ('id', 'user', 'name', 'description', 'level', 'stype', 'slides',
-              'start', 'duration')
+              'video', 'start', 'duration')
     read_only_fields = fields
 
 
@@ -22,7 +22,7 @@ class SessionSizzler(DynamicFieldsMixin, serializers.ModelSerializer):
 
   class Meta:
     model = Session
-    fields = ('name', 'description', 'level', 'stype', 'slides',
+    fields = ('name', 'description', 'level', 'stype', 'slides', 'video',
               'special_requirements')
 
 
