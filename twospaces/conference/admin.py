@@ -91,8 +91,8 @@ class SponsorAdmin(admin.ModelAdmin):
 class SessionAdmin(CSVAdminMixin, admin.ModelAdmin):
   list_select_related = ('user',)
   list_display = ('name', 'conference', 'user', 'full_name', 'email', 'stype',
-                  'level', 'start', 'duration', 'room', 'all_rooms', 'video_url',
-                  'status')
+                  'level', 'start', 'duration', 'room', 'all_rooms',
+                  'video_url', 'status')
   csv_rows = ('id', 'name', 'conference', 'user', 'full_name', 'email', 'stype',
               'level', 'start', 'duration', 'status', 'admin_link', 'user_link')
   list_filter = ('conference', 'room', 'stype', 'level', 'status')
