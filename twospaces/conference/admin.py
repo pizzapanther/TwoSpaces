@@ -91,13 +91,13 @@ class SponsorAdmin(admin.ModelAdmin):
 class SessionAdmin(CSVAdminMixin, admin.ModelAdmin):
   list_select_related = ('user',)
   list_display = ('name', 'conference', 'user', 'full_name', 'email', 'stype',
-                  'level', 'start', 'duration', 'room', 'all_rooms', 'video',
+                  'level', 'start', 'duration', 'room', 'all_rooms', 'video_url',
                   'status')
   csv_rows = ('id', 'name', 'conference', 'user', 'full_name', 'email', 'stype',
               'level', 'start', 'duration', 'status', 'admin_link', 'user_link')
   list_filter = ('conference', 'room', 'stype', 'level', 'status')
   date_hierarchy = 'start'
-  list_editable = ('room', 'all_rooms', 'video', 'status', 'start')
+  list_editable = ('room', 'all_rooms', 'video_url', 'status', 'start')
   raw_id_fields = ('user',)
   autocomplete_lookup_fields = {'fk': ['user'],}
 
