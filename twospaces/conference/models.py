@@ -190,7 +190,7 @@ SESSION_LEVELS = (
 
 class Session(models.Model):
   user = models.ForeignKey(settings.AUTH_USER_MODEL)
-  conference = models.ForeignKey(Conference)
+  conference = models.ForeignKey(Conference, related_name='sessions')
 
   room = models.ForeignKey(Room, blank=True, null=True)
   all_rooms = models.BooleanField(default=False)
@@ -199,6 +199,7 @@ class Session(models.Model):
   name = models.CharField('Title of Talk', max_length=100)
   description = models.TextField()
   slides = models.URLField('URL To Presentation', blank=True, null=True)
+  video = models.URLField('URL To Video', blank=True, null=True)
 
   stype = models.CharField('Session Type', max_length=25, choices=SESSION_TYPES)
   level = models.CharField('Audience Level',
