@@ -199,6 +199,7 @@ class Session(models.Model):
   name = models.CharField('Title of Talk', max_length=100)
   description = models.TextField()
   slides = models.URLField('URL To Presentation', blank=True, null=True)
+  video = models.URLField('URL To Video', blank=True, null=True)
 
   stype = models.CharField('Session Type', max_length=25, choices=SESSION_TYPES)
   level = models.CharField('Audience Level',
