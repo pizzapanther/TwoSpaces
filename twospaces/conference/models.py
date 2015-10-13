@@ -190,7 +190,7 @@ SESSION_LEVELS = (
 
 class Session(models.Model):
   user = models.ForeignKey(settings.AUTH_USER_MODEL)
-  conference = models.ForeignKey(Conference, related_name='sessions')
+  conference = models.ForeignKey(Conference)
 
   room = models.ForeignKey(Room, blank=True, null=True)
   all_rooms = models.BooleanField(default=False)

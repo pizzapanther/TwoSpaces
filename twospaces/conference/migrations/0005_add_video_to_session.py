@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='session',
             name='conference',
-            field=models.ForeignKey(related_name='sessions', to='conference.Conference'),
+            field=models.ForeignKey(to='conference.Conference'),
         ),
         migrations.AlterField(
             model_name='session',
