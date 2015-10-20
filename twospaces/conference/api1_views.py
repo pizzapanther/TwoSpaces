@@ -22,7 +22,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from twospaces.conference.models import Session, Conference, SponsorshipLevel
 from twospaces.conference.serializers import ProposedReadSizzler, \
   SessionSizzler, ConferenceReadSizzler, SponsorshipLevelSizzler, \
-  SessionScheduleSizzler
+  SessionScheduleSizzler, SessionPyVideoSizzler
 
 
 @api_view(['GET'])
@@ -233,7 +233,20 @@ def schedule(request):
 
   return Response(schedule, status=200)
 
-
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def pyvideo (request):
+  conf = request.GET.get('conf', '')
+  conf = get_object_or_404(Conference, slug=conf)
+  
+  queryset = Session.objects.filter(
+      status='accepted',
+      conference=conf).exclude(
+        stype='lightning').order_by('start').select_related('room', 'user')
+        
+  sizzler = SessionPyVideoSizzler(queryset, many=True, context={'request': request})
+  return Response(sizzler.data)
+  
 def attendee_data(page=1):
   url = '{}/events/{}/attendees/'.format(settings.EVENTBRITE_API_URL,
                                          settings.EVENTBRITE_EVENT_ID)

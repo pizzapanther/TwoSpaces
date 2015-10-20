@@ -23,6 +23,9 @@ speakers_v1_urls = [
     url(r'^schedule$',
         conf_v1_views.schedule,
         name="schedule"),
+    url(r'^pyvideo$',
+        conf_v1_views.pyvideo,
+        name="pyvideo"),
 ]
 
 users_v1_urls = [
