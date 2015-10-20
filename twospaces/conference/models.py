@@ -267,18 +267,19 @@ class Session(models.Model):
 
     return self.stype
 
-  def released (self):
+  def released(self):
     return True
-    
-  def license (self):
+
+  def license(self):
     return 'CC-BY'
-    
-  def language (self):
+
+  def language(self):
     return 'English'
-    
-  def url (self):
-    return '{}/{}/talk/{}'.format(settings.BASE_URL, self.conference.slug, self.id)
-    
+
+  def url(self):
+    return '{}/{}/talk/{}'.format(settings.BASE_URL, self.conference.slug,
+                                  self.id)
+
   @staticmethod
   def schedule(conference, day):
     return Session.objects.filter(

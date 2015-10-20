@@ -77,6 +77,7 @@ class SessionScheduleSizzler(serializers.ModelSerializer):
         'id', 'name', 'level', 'stype', 'all_rooms', 'room', 'start', 'end',
         'duration', 'user')
 
+
 class SessionPyVideoSizzler(serializers.ModelSerializer):
   room = RoomSizzler()
   speaker = UserSizzler(source='user')
@@ -85,11 +86,10 @@ class SessionPyVideoSizzler(serializers.ModelSerializer):
   released = serializers.BooleanField()
   slides_url = serializers.CharField(source='slides')
   url = serializers.CharField()
-  
+
   class Meta:
     model = Session
     fields = (
         'id', 'name', 'description', 'type', 'room', 'start', 'end', 'url',
-        'duration', 'speaker', 'make_recording', 'released', 'license', 'language',
-        'video_url', 'slides_url')
-        
+        'duration', 'speaker', 'make_recording', 'released', 'license',
+        'language', 'video_url', 'slides_url')

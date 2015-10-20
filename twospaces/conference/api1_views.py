@@ -233,20 +233,24 @@ def schedule(request):
 
   return Response(schedule, status=200)
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def pyvideo (request):
+def pyvideo(request):
   conf = request.GET.get('conf', '')
   conf = get_object_or_404(Conference, slug=conf)
-  
+
   queryset = Session.objects.filter(
       status='accepted',
       conference=conf).exclude(
-        stype='lightning').order_by('start').select_related('room', 'user')
-        
-  sizzler = SessionPyVideoSizzler(queryset, many=True, context={'request': request})
+          stype='lightning').order_by('start').select_related('room', 'user')
+
+  sizzler = SessionPyVideoSizzler(queryset,
+                                  many=True,
+                                  context={'request': request})
   return Response(sizzler.data)
-  
+
+
 def attendee_data(page=1):
   url = '{}/events/{}/attendees/'.format(settings.EVENTBRITE_API_URL,
                                          settings.EVENTBRITE_EVENT_ID)
