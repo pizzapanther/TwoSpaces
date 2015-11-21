@@ -155,6 +155,26 @@ def append_room(hour, room_key, talk):
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 @cache_page(settings.API_CACHE, key_prefix=RELEASE)
+def talk_videos(request):
+  conf = request.GET.get('conf', '')
+  conf = get_object_or_404(Conference, slug=conf)
+
+  queryset = Session.objects.filter(
+      status='accepted',
+      conference=conf,
+      video_url__isnull=False).order_by('name').select_related('user')
+
+  sizzler = SessionPyVideoSizzler(
+      queryset,
+      many=True,
+      exclude=('description', 'room', 'end', 'make_recording', 'released',
+               'license', 'language'))
+  return Response(sizzler.data)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+@cache_page(settings.API_CACHE, key_prefix=RELEASE)
 def schedule(request):
   schedule = []
   conf = request.GET.get('conf', '')
@@ -242,8 +262,7 @@ def pyvideo(request):
 
   queryset = Session.objects.filter(
       status='accepted',
-      conference=conf).exclude(
-          stype='lightning').order_by('start').select_related('room', 'user')
+      conference=conf).order_by('start').select_related('room', 'user')
 
   sizzler = SessionPyVideoSizzler(queryset,
                                   many=True,

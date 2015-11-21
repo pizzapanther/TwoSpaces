@@ -78,9 +78,11 @@ class SessionScheduleSizzler(serializers.ModelSerializer):
         'duration', 'user')
 
 
-class SessionPyVideoSizzler(serializers.ModelSerializer):
+class SessionPyVideoSizzler(DynamicFieldsMixin, serializers.ModelSerializer):
   room = RoomSizzler()
-  speaker = UserSizzler(source='user')
+  speaker = UserPublicSizzler(
+      source='user',
+      exclude=('biography', 'website', 'social_handles'))
   type = serializers.CharField(source='get_stype_display')
   make_recording = serializers.BooleanField(source='video')
   released = serializers.BooleanField()
